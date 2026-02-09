@@ -1,0 +1,38 @@
+name: 🏰 Fortress Gate (CI)
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  quality-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: 📝 Lint Check (Biome/ESLint)
+        run: npm run lint
+
+      - name: 📜 TypeSpec Compilation Check
+        run: npx tsp compile ./tsp --emit @typespec/openapi3
+
+      - name: 🧪 Unit Test (Vitest)
+        run: npm run test
+
+      - name: ☢️ Mutation Test (Stryker)
+        # ミューテーションスコアが閾値を下回ったら落とす設定を後で追加
+        run: npx stryker run
+
+      - name: 🔨 Build
+        run: npm run build

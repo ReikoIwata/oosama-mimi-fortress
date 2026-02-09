@@ -4,7 +4,8 @@
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy --minify",
-    "cf-typegen": "wrangler types --env-interface CloudflareBindings"
+    "cf-typegen": "wrangler types --env-interface CloudflareBindings",
+    "prepare": "husky install"
   },
   "dependencies": {
     "hono": "^4.11.9",
@@ -14,6 +15,7 @@
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260207.0",
     "vitest": "^4.0.18",
-    "wrangler": "^4.4.0"
+    "wrangler": "^4.4.0",
+    "husky": "^8.0.0"
   }
 }
