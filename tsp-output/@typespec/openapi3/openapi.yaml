@@ -1,0 +1,159 @@
+openapi: 3.0.0
+info:
+  title: おおさまのみみはろばのみみ API
+  version: 0.0.0
+tags: []
+paths:
+  /secrets:
+    get:
+      operationId: Secrets_getStats
+      description: データの状態を確認する
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PitStatus'
+        default:
+          description: An unexpected error response.
+          headers:
+            x-trace-id:
+              required: true
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+    post:
+      operationId: Secrets_shout
+      description: 秘密をPOST
+      parameters: []
+      responses:
+        '201':
+          description: The request has succeeded and a new resource has been created as a result.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                required:
+                  - id
+        '403':
+          description: Access is forbidden.
+          headers:
+            x-trace-id:
+              required: true
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        default:
+          description: An unexpected error response.
+          headers:
+            x-trace-id:
+              required: true
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShoutRequest'
+  /secrets/{id}:
+    delete:
+      operationId: Secrets_delete
+      description: 特定の秘密を削除
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    enum:
+                      - 抹消完了
+                required:
+                  - message
+        default:
+          description: An unexpected error response.
+          headers:
+            x-trace-id:
+              required: true
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+components:
+  schemas:
+    ForbiddenError:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/ProblemDetails'
+    PitStatus:
+      type: object
+      required:
+        - totalCount
+        - lastShoutedAt
+      properties:
+        totalCount:
+          type: integer
+          format: uint32
+        lastShoutedAt:
+          type: string
+          format: date-time
+      description: 秘密の状態
+    ProblemDetails:
+      type: object
+      required:
+        - type
+        - title
+        - status
+        - detail
+      properties:
+        type:
+          type: string
+        title:
+          type: string
+        status:
+          type: integer
+          format: int32
+        detail:
+          type: string
+      description: RFC 7807 準拠のエラー構造
+    ShoutRequest:
+      type: object
+      required:
+        - content
+      properties:
+        content:
+          type: string
+          minLength: 1
+          maxLength: 140
+      description: 秘密のデータ
+servers:
+  - url: https://api.oosama-mimi-fortress.com
+    description: 本番環境
+    variables: {}
